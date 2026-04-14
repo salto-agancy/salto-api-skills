@@ -67,7 +67,7 @@ ym:s:goalreaches>0
 
 ### Брендовый трафик (фраза содержит бренд)
 ```
-ym:s:searchPhrase=@'devicedoctor'
+ym:s:searchPhrase=@'название_бренда'
 ```
 
 ## URL-encoding

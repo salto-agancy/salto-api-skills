@@ -5,94 +5,154 @@ description: "Яндекс.Метрика API — визиты, источник
 
 # Яндекс.Метрика API — Skill
 
-Работа с API Яндекс.Метрики (api-metrika.yandex.net) — визиты, цели, источники трафика, фильтры по городам, по устройствам.
+Работа с API Яндекс.Метрики (api-metrika.yandex.net) — визиты, цели, источники трафика, метрики карточки Яндекс.Бизнес.
 
-Также — метрики карточки Яндекс.Бизнес (переходы в профиль, клики по телефону, маршруты, переходы на сайт).
+Один и тот же OAuth-токен работает для Метрики и Директа.
 
-## Когда использовать
+---
 
-- Отчёт по визитам/пользователям за период
-- Разбивка трафика по источникам (реклама, поиск, прямые, соцсети)
-- Яндекс.Бизнес — метрики карточки организации
-- Цели Метрики (заявки, клики по телефону)
-- Фильтрация ботов/сканеров (для новых сайтов)
-- Сравнение мобилки vs десктопа
+## Workflow для Claude (всё под ключ)
 
-## Быстрый старт
+### Если пользователь впервые работает со скиллом
 
-1. Создай `~/.config/yandex-metrika/.env`:
-   ```
-   YANDEX_METRIKA_TOKEN=<OAuth token>
-   YANDEX_CLIENT_ID=<client_id (для refresh)>
-   YANDEX_CLIENT_SECRET=<client_secret (для refresh)>
-   ```
-2. Запусти:
+Проверь: есть ли `~/.config/yandex-metrika/.env` с `YANDEX_METRIKA_TOKEN`?
+
+```bash
+test -f ~/.config/yandex-metrika/.env && grep -q YANDEX_METRIKA_TOKEN ~/.config/yandex-metrika/.env && echo "есть" || echo "нет"
+```
+
+**Если нет токена** — запусти процесс настройки (см. ниже).
+
+**Если есть** — переходи сразу к запросу пользователя.
+
+### Процесс настройки OAuth (Claude ведёт)
+
+Цель: пользователь не должен лазить в терминал. Claude:
+1. Сам открывает страницы Яндекса через `open <url>` (macOS) или `xdg-open` (Linux)
+2. Подсказывает что выбрать на каждой странице
+3. Просит у пользователя только то что Claude сам не может узнать (логин-пароль он сам не получит — это вводит пользователь в браузере)
+4. Получает короткие данные через диалог (ClientID, Client Secret, 7-значный код)
+5. Сам сохраняет креды и токен в `.env`
+
+Шаги:
+
+#### Шаг 1: Создание OAuth-приложения
+
+Спроси у пользователя: *«Есть уже OAuth-приложение Яндекса? (Если не уверен — нет.)»*
+
+**Если нет**:
+1. Открой страницу создания: `open https://oauth.yandex.ru/client/new`
+2. Сообщи пользователю текстом:
+   > Открыл страницу создания приложения. Заполни так:
+   > - **Название**: «Salto Reports» (любое)
+   > - **Платформа**: Веб-сервисы
+   > - **Redirect URI**: `https://oauth.yandex.ru/verification_code` (скопируй точно)
+   > - **Доступ**: отметь «Яндекс.Метрика → Получение статистики» и «Яндекс.Директ → Использование API в режиме чтения»
+   > - Нажми «Создать приложение»
+   >
+   > Когда создашь — пришли мне ClientID и Client Secret из карточки приложения (по 32 символа).
+3. Дождись от пользователя ClientID и Client Secret.
+4. Сохрани:
    ```bash
-   python3 scripts/monthly_report.py <counter_id> 2026-03
+   mkdir -p ~/.config/yandex-metrika && chmod 700 ~/.config/yandex-metrika
+   cat > ~/.config/yandex-metrika/.env <<'EOF'
+   YANDEX_CLIENT_ID=<from user>
+   YANDEX_CLIENT_SECRET=<from user>
+   EOF
+   chmod 600 ~/.config/yandex-metrika/.env
    ```
 
-## OAuth получение токена
+**Если есть** — попроси у пользователя ClientID и Client Secret из карточки существующего приложения, сохрани так же.
 
-Если токена нет, см. `scripts/get_oauth_token.py` — полный flow:
-1. Создать приложение на https://oauth.yandex.ru/client/new (scope: metrika:read)
-2. Запустить скрипт, открыть выданный URL, авторизоваться
-3. Вставить code обратно в скрипт — он обменяет на токен
+#### Шаг 2: Авторизация и получение кода
 
-## Структура
+1. Открой страницу авторизации:
+   ```bash
+   open "https://oauth.yandex.ru/authorize?response_type=code&client_id=<CLIENT_ID>"
+   ```
+2. Сообщи пользователю:
+   > Открыл страницу авторизации Яндекса. Войди в нужный аккаунт (тот, к которому привязаны счётчики Метрики), нажми «Разрешить».
+   > После этого Яндекс покажет 7-значный КОД ПОДТВЕРЖДЕНИЯ. Пришли его мне.
+3. Дождись 7-значного кода от пользователя.
 
-```
-api-yandex-metrika/
-├── SKILL.md
-├── README.md
-├── scripts/
-│   ├── get_oauth_token.py           # OAuth flow для получения токена
-│   ├── query.py                     # универсальный query helper
-│   ├── monthly_report.py            # визиты/пользователи/отказы за период
-│   ├── traffic_sources.py           # разбивка по источникам (ad/organic/direct)
-│   ├── ads_only.py                  # только рекламный трафик
-│   ├── goals_report.py              # цели (заявки, звонки)
-│   ├── business_card.py             # метрики карточки Яндекс.Бизнес
-│   ├── cities.py                    # топ городов (фильтр ботов)
-│   └── list_counters.py             # все счётчики аккаунта
-├── examples/
-│   ├── response_stat_v1.json        # пример ответа /stat/v1/data
-│   └── dimensions_metrics.md        # популярные dimensions и metrics
-└── references/
-    ├── endpoints.md
-    ├── dimensions_metrics.md        # шпаргалка по полям
-    ├── filters.md                   # синтаксис фильтров
-    └── yandex_business.md           # особенности карточки ЯБ
+#### Шаг 3: Обмен кода на токен
+
+```bash
+CODE=<7 цифр от пользователя>
+CLIENT_ID=$(grep YANDEX_CLIENT_ID ~/.config/yandex-metrika/.env | cut -d= -f2)
+CLIENT_SECRET=$(grep YANDEX_CLIENT_SECRET ~/.config/yandex-metrika/.env | cut -d= -f2)
+
+curl -s -X POST https://oauth.yandex.ru/token \
+  -d grant_type=authorization_code \
+  -d code=$CODE \
+  -d client_id=$CLIENT_ID \
+  -d client_secret=$CLIENT_SECRET
 ```
 
-## Главное — что не очевидно
+Получишь JSON с `access_token`, `refresh_token`, `expires_in`.
 
-1. **Header**: `Authorization: OAuth {token}` — **именно `OAuth`**, не `Bearer`
-2. **Токен один и тот же** для Метрики, Директа и Яндекс.Бизнес API (единый OAuth Яндекса)
-3. **Яндекс.Бизнес метрики** получаются через Метрику карточки (отдельный счётчик на карточку)
-4. **Показы рекламы ≠ визиты Метрики**. Показы — это Impressions Директа
-5. **Боты**: новые сайты получают много ботов из Франкфурта/Амстердама/Бангкока. Фильтруй по `regionCity` для реальной картины
-6. **Цели**: `goalreaches` — сумма всех целей, `goal<N>reaches` — конкретная цель по ID
+#### Шаг 4: Сохранение токена
 
-## Счётчики в компании
+```bash
+TOKEN=<access_token из ответа>
+EXPIRES=<вычислить дату через expires_in секунд от сегодня>
 
-В конфиге храни маппинг типа:
+# Метрика
+cat >> ~/.config/yandex-metrika/.env <<EOF
+YANDEX_METRIKA_TOKEN=$TOKEN
+YANDEX_METRIKA_TOKEN_EXPIRES=$EXPIRES
+YANDEX_METRIKA_REFRESH_TOKEN=<refresh_token>
+EOF
+
+# Директ — тот же токен
+mkdir -p ~/.config/yandex-direct && chmod 700 ~/.config/yandex-direct
+cat > ~/.config/yandex-direct/.env <<EOF
+YANDEX_DIRECT_TOKEN=$TOKEN
+EOF
+chmod 600 ~/.config/yandex-direct/.env
 ```
-# ~/.config/yandex-metrika/counters.json
-{
-  "client-a-site": "12345678",
-  "client-a-yandex-business": "87654321",
-  "client-b-site": "11223344"
-}
+
+#### Шаг 5: Проверка
+
+```bash
+python3 scripts/list_counters.py
 ```
 
-Удобно использовать в `scripts/monthly_report.py client-a-site 2026-03`.
+Покажи пользователю список его счётчиков. Спроси: «Какой считаем?»
+
+Если есть запасной CLI-вариант: `scripts/get_oauth_token.py` (интерактивный) — но в большинстве случаев Claude должен оркестрировать процесс сам, как описано выше.
+
+---
+
+## Что делает скилл (после настройки)
+
+- Месячный отчёт: визиты, пользователи, отказы, глубина, время на сайте
+- Разбивка по источникам (реклама / поиск / прямые / соцсети)
+- Только рекламный трафик (фильтр `trafficSource=='ad'`)
+- Топ городов (отделяет ботов из зарубежья)
+- Цели Метрики: список + достижения + конверсии
+- Яндекс.Бизнес карточка: клики по телефону, маршруты, переходы на сайт
+- Сравнение двух периодов одним запросом
+- Logs API — выгрузка сырых визитов
+
+## Безопасность
+
+- ✅ У каждого пользователя СВОЙ ClientID + Client Secret. Скилл не использует общее приложение
+- ✅ Креды только в `~/.config/yandex-metrika/.env` (`chmod 600`)
+- ✅ В git не уходят (`.gitignore`)
+- ✅ Скрипт открытый — можно проверить что отправляется только в Яндекс
+- ⚠️ Client Secret — это пароль приложения, не выкладывать в публичные репо
 
 ## Документация
 
 - https://yandex.ru/dev/metrika/ru/
-- https://yandex.ru/dev/metrika/ru/stat/v1/
-- Список полей: https://yandex.ru/dev/metrika/ru/stat/api/api-fields
+- Поля API: https://yandex.ru/dev/metrika/ru/stat/api/api-fields
+- OAuth Яндекса: https://yandex.ru/dev/id/doc/dg/oauth/
 
-## Безопасность
-
-Скилл читает токен ТОЛЬКО из `~/.config/yandex-metrika/.env`. В коде и логах токен не печатается.
+См. также:
+- `references/create_yandex_app.md` — пошаговая регистрация приложения (если Claude нужно сослаться)
+- `references/endpoints.md` — все API endpoints
+- `references/dimensions_metrics.md` — поля для запросов
+- `references/filters.md` — синтаксис фильтров
+- `references/yandex_business.md` — особенности карточки Я.Бизнес
+- `references/advanced.md` — атрибуция, drill-down, Logs API
