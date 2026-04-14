@@ -1,0 +1,19 @@
+{
+  "_comment": "Пример ответа GET /how-knows — справочник источников клиентов",
+  "data": [
+    { "id": "655ca363dfbb6b05c5343b7c", "name": "2ГиС", "isRepeat": false },
+    { "id": "655ca363dfbb6b05c5343b7b", "name": "Наши знакомые", "isRepeat": false },
+    { "id": "655ca363dfbb6b05c5343b7d", "name": "Повторное обращение", "isRepeat": true },
+    { "id": "663bb63207dbeb09cb1bf022", "name": "Проходил мимо", "isRepeat": false },
+    { "id": "66aa7bbb9ff95975053eca8b", "name": "Яндекс карты", "isRepeat": false },
+    { "id": "66aa7bbf9ff95975053ecae1", "name": "Авито", "isRepeat": false },
+    { "id": "66aa7c629ff95975053ed57f", "name": "Флаер 15%", "isRepeat": false },
+    { "id": "68fe59f42deefa9bf7dbc424", "name": "Директ", "isRepeat": false },
+    { "id": "67eab185e6044b5bbbb4bcd6", "name": "Карты Google", "isRepeat": false },
+    { "id": "66e017547632ca28ade5abf0", "name": "Поиск в интернете", "isRepeat": false },
+    { "id": "66d9ed7a524a882a956030e9", "name": "Совет знакомых", "isRepeat": false },
+    { "id": "685071e51e257f362e9409f2", "name": "Вывеска", "isRepeat": false }
+  ],
+  "remainRequest": 97,
+  "expireDate": "2026-04-13T16:31:28.000Z"
+}

@@ -1,0 +1,99 @@
+{
+  "_comment": "Пример ответа GET /orders/{id} (detail). Содержит howKnow, positions, brand+model отдельно, purchasePrice.",
+  "data": {
+    "id": "69cc09cddb593d44cfba3899",
+    "number": "Б001761",
+    "num": 1761,
+    "dateCreate": "2026-03-31T17:52:13.827Z",
+    "dateFinish": "2026-04-01T09:30:46.703Z",
+    "dateClose": "2026-04-04T17:06:26.694Z",
+    "deadline": "2026-04-30T17:50:00.000Z",
+    "lastAction": "2026-04-04T17:06:26.694Z",
+    "brand": "Samsung",
+    "model": "A54",
+    "color": "Серый",
+    "node": "Диагностика",
+    "typeDevice": "Смартфон",
+    "typeDeviceId": "661fcf7dc9b542063b778cab",
+    "problem": ["Не включается"],
+    "completeSet": ["устройство"],
+    "appearance": [
+      "царапины",
+      "потертости",
+      "Разбито заднее стекло"
+    ],
+    "customFields": [
+      { "id": "661ff7c1c9b542063b7f8b94", "value": "1953" }
+    ],
+    "typeOrder": {
+      "id": "655ca363dfbb6b05c5343cd0",
+      "name": "1. Смартфон, планшет"
+    },
+    "howKnow": {
+      "id": "655ca363dfbb6b05c5343b7d",
+      "name": "Повторное обращение"
+    },
+    "status": {
+      "id": "655ca363dfbb6b05c5343cd4",
+      "name": "ВЫДАН",
+      "type": "closed",
+      "color": "#8C9597",
+      "isPayRequired": true
+    },
+    "counteragent": {
+      "id": "69174a5d81b09570ccf42ad1",
+      "name": "Иванов Иван Иванович",
+      "phones": ["+7 (XXX) XXX-XX-XX"],
+      "isBuyer": true
+    },
+    "positions": [
+      {
+        "positionId": "69cce5c2db593d9ee0c4273d",
+        "modifyId": "668d23ebf0c95230eac30000",
+        "name": "Замена дисплея Samsung A54",
+        "count": 1,
+        "soldPriceSumm": 5000,
+        "purchasePriceSumm": 2000,
+        "measure": {
+          "id": "655ca363dfbb6b05c5343b77",
+          "value": "шт.",
+          "isFloat": false
+        }
+      }
+    ],
+    "summ": {
+      "price": 1500,
+      "soldPrice": 1500,
+      "purchasePrice": 500
+    },
+    "cash": {
+      "order": 1500,
+      "orderReturn": 0,
+      "invoice": 0,
+      "elements": [
+        {
+          "id": "69d145126dd2776d3b1ee818",
+          "date": "2026-04-04T17:06:26.694Z",
+          "money": 1500,
+          "type": "order"
+        }
+      ]
+    },
+    "createManager": {
+      "id": "66642c9639a7e0780957e67c",
+      "name": "Админ Мастерской",
+      "shortName": "Админ М."
+    },
+    "closeManager": {
+      "id": "66642c9639a7e0780957e67c",
+      "name": "Админ Мастерской",
+      "shortName": "Админ М."
+    },
+    "shop": {
+      "id": "655ca363dfbb6b05c5343bb0",
+      "name": "Мастерская"
+    }
+  },
+  "remainRequest": 95,
+  "expireDate": "2026-04-13T16:31:28.000Z"
+}

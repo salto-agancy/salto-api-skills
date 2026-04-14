@@ -1,0 +1,56 @@
+{
+  "_comment": "Пример ответа GET /shops/{shopId}/orders (list). БЕЗ howKnow и purchasePrice.",
+  "data": [
+    {
+      "id": "69cc09cddb593d44cfba3899",
+      "number": "Б001761",
+      "num": 1761,
+      "dateCreate": "2026-03-31T17:52:13.827Z",
+      "deadline": "2026-04-30T17:50:00.000Z",
+      "isUrgent": false,
+      "isVisible": true,
+      "color": "Серый",
+      "typeOrder": {
+        "id": "655ca363dfbb6b05c5343cd0",
+        "name": "1. Смартфон, планшет"
+      },
+      "typeDevice": "Смартфон",
+      "device": "Samsung A54",
+      "problem": [
+        "Не включается"
+      ],
+      "summ": {
+        "price": 1500,
+        "soldPrice": 1500
+      },
+      "cash": {
+        "summ": 1500
+      },
+      "status": {
+        "id": "655ca363dfbb6b05c5343cd4",
+        "name": "ВЫДАН",
+        "color": "#8C9597",
+        "type": "closed",
+        "comment": "none",
+        "isChange": true
+      },
+      "counteragent": {
+        "id": "69174a5d81b09570ccf42ad1",
+        "name": "Иванов Иван Иванович",
+        "rating": 0,
+        "phones": ["+7 (XXX) XXX-XX-XX"]
+      },
+      "shop": {
+        "id": "655ca363dfbb6b05c5343bb0",
+        "name": "Мастерская",
+        "color": "#ff6666"
+      }
+    }
+  ],
+  "total": 113,
+  "page": 1,
+  "pageSize": 50,
+  "sort": "-dateCreate",
+  "remainRequest": 98,
+  "expireDate": "2026-04-13T16:31:28.000Z"
+}

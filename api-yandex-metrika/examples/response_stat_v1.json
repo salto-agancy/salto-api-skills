@@ -1,0 +1,32 @@
+{
+  "_comment": "Пример ответа GET /stat/v1/data с dimensions=ym:s:trafficSource, metrics=ym:s:visits,ym:s:users",
+  "query": {
+    "ids": [12345678],
+    "dimensions": ["ym:s:trafficSource"],
+    "metrics": ["ym:s:visits", "ym:s:users"],
+    "date1": "2026-03-01",
+    "date2": "2026-03-31"
+  },
+  "data": [
+    {
+      "dimensions": [{"name": "Переходы из поисковых систем", "id": "organic"}],
+      "metrics": [4521, 3210]
+    },
+    {
+      "dimensions": [{"name": "Переходы с рекламы", "id": "ad"}],
+      "metrics": [748, 612]
+    },
+    {
+      "dimensions": [{"name": "Прямые заходы", "id": "direct"}],
+      "metrics": [389, 301]
+    },
+    {
+      "dimensions": [{"name": "Переходы по ссылкам на сайтах", "id": "referral"}],
+      "metrics": [142, 127]
+    }
+  ],
+  "total_rows": 4,
+  "totals": [5800, 4250],
+  "sampled": false,
+  "sample_share": 1.0
+}

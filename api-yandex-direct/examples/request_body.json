@@ -1,0 +1,39 @@
+{
+  "_comment": "Пример тела запроса POST /json/v5/reports для CAMPAIGN_PERFORMANCE_REPORT",
+  "params": {
+    "SelectionCriteria": {
+      "DateFrom": "2026-03-01",
+      "DateTo": "2026-03-31",
+      "Filter": [
+        {
+          "Field": "Impressions",
+          "Operator": "GREATER_THAN",
+          "Values": ["0"]
+        }
+      ]
+    },
+    "FieldNames": [
+      "CampaignName",
+      "CampaignId",
+      "Impressions",
+      "Clicks",
+      "Cost",
+      "Ctr",
+      "AvgCpc",
+      "Conversions",
+      "CostPerConversion"
+    ],
+    "OrderBy": [
+      {
+        "Field": "Cost",
+        "SortOrder": "DESCENDING"
+      }
+    ],
+    "ReportName": "march-2026-campaigns-1712345678",
+    "ReportType": "CAMPAIGN_PERFORMANCE_REPORT",
+    "DateRangeType": "CUSTOM_DATE",
+    "Format": "TSV",
+    "IncludeVAT": "YES",
+    "IncludeDiscount": "NO"
+  }
+}
