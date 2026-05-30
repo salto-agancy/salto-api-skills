@@ -36,19 +36,31 @@ if __name__ == '__main__':
     print(f'Переходы в профиль: {r["totals"][0]:,.0f}')
     print(f'Уникальных пользователей: {r["totals"][1]:,.0f}')
 
-    # Цели (маршруты, звонки, сайт)
-    print('\n--- Действия в карточке ---')
+    # Цели (маршруты, звонки, сайт). По умолчанию — только non-zero, чтобы не показывать
+    # 30+ нулевых типовых goal'ов Я.Бизнес. Покажем все через --all.
+    print('\n--- Действия в карточке (только non-zero) ---')
+    show_all = '--all' in sys.argv
     goals = list_goals(counter, token)
+    rows = []
     for g in goals:
         gid = g['id']
         gname = g['name']
+        # Срезать суффикс адреса (" - проспект Победы, 106А"), который Я.Бизнес добавляет к каждой цели
+        if ' - ' in gname:
+            gname = gname.rsplit(' - ', 1)[0]
         try:
             r = stat_query(counter, f'ym:s:goal{gid}reaches',
                           date1=date1, date2=date2, token=token)
             reaches = r['totals'][0]
-            print(f'  {gname:<40} {reaches:>8,.0f}')
+            if reaches or show_all:
+                rows.append((gname, reaches))
         except Exception:
             pass
+    rows.sort(key=lambda x: -x[1])
+    for gname, reaches in rows:
+        print(f'  {gname:<40} {reaches:>8,.0f}')
+    if not show_all:
+        print(f'  (скрыто {len(goals) - len(rows)} нулевых целей, --all чтобы показать)')
 
     # По устройствам
     print('\n--- По устройствам ---')

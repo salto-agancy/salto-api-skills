@@ -75,23 +75,38 @@ if __name__ == '__main__':
         city = row['dimensions'][0]['name']
         print(f'  {city:<30} {row["metrics"][0]:>5,.0f}')
 
-    # Устройства
+    # Устройства. Goalreaches опционально — у счётчиков без целей сломает запрос.
     print('\n--- Устройства ---')
-    r = stat_query(
-        counter, 'ym:s:visits,ym:s:goalreaches',
-        dimensions='ym:s:deviceCategory',
-        date1=date1, date2=date2, token=token,
-    )
-    for row in r['data']:
-        dev = row['dimensions'][0]['name']
-        v, g = row['metrics']
-        print(f'  {dev:<15} {v:>7,.0f} визитов, {g:>4,.0f} целей')
+    try:
+        r = stat_query(
+            counter, 'ym:s:visits,ym:s:goalreaches',
+            dimensions='ym:s:deviceCategory',
+            date1=date1, date2=date2, token=token,
+        )
+        for row in r['data']:
+            dev = row['dimensions'][0]['name']
+            v, g = row['metrics']
+            print(f'  {dev:<15} {v:>7,.0f} визитов, {g:>4,.0f} целей')
+    except Exception:
+        # fallback без goalreaches (нет целей в счётчике)
+        r = stat_query(
+            counter, 'ym:s:visits',
+            dimensions='ym:s:deviceCategory',
+            date1=date1, date2=date2, token=token,
+        )
+        for row in r['data']:
+            dev = row['dimensions'][0]['name']
+            print(f'  {dev:<15} {row["metrics"][0]:>7,.0f} визитов')
 
-    # Цели
+    # Цели. У многих клиентских сайтов целей нет — API вернёт 400.
     print('\n--- Цели ---')
-    r = stat_query(
-        counter, 'ym:s:goalreaches,ym:s:goalConversion',
-        date1=date1, date2=date2, token=token,
-    )
-    print(f'  Достижений целей: {r["totals"][0]:,.0f}')
-    print(f'  Конверсия: {r["totals"][1]:.2f}%')
+    try:
+        r = stat_query(
+            counter, 'ym:s:goalreaches,ym:s:goalConversion',
+            date1=date1, date2=date2, token=token,
+        )
+        print(f'  Достижений целей: {r["totals"][0]:,.0f}')
+        print(f'  Конверсия: {r["totals"][1]:.2f}%')
+    except Exception as e:
+        # типично: HTTP 400 если в счётчике нет настроенных целей
+        print(f'  (целей в счётчике нет или API вернул ошибку: {e.__class__.__name__})')
