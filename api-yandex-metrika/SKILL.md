@@ -134,6 +134,43 @@ python3 scripts/list_counters.py
 - Яндекс.Бизнес карточка: клики по телефону, маршруты, переходы на сайт
 - Сравнение двух периодов одним запросом
 - Logs API — выгрузка сырых визитов
+- **SEO-аудит** (`scripts/seo_audit.py`): тренд по месяцам + источники + поисковые системы + top organic phrases + top pages + bounce по landing — типовой набор для разговора с клиентом «почему сайт не в топе»
+
+## Готовые сниппеты (для типовых задач)
+
+### SEO-аудит за период
+```bash
+python3 scripts/seo_audit.py <counter_id> 2026-03-01 2026-05-31
+```
+Дашборд из 5 блоков (тренд / источники / поисковики / organic-фразы / top pages / bounce by landing).
+
+### Бренд vs не-бренд в organic
+```python
+from query import stat_query
+# бренд
+r1 = stat_query(c, 'ym:s:visits', dimensions='ym:s:searchPhrase',
+                filters="ym:s:trafficSource=='organic' AND ym:s:searchPhrase=@'remobile'",
+                date1='2026-05-01', date2='2026-05-30', token=t)
+# не-бренд
+r2 = stat_query(c, 'ym:s:visits', dimensions='ym:s:searchPhrase',
+                filters="ym:s:trafficSource=='organic' AND ym:s:searchPhrase!@'remobile'",
+                date1='2026-05-01', date2='2026-05-30', token=t)
+```
+
+### Я.Бизнес карточка vs сайт за тот же месяц
+Карточка ЯБ — это **отдельный counter** (см. `scripts/list_counters.py`, имена с `yandex.ru/maps`). У клиента-локального бизнеса карточка обычно даёт 10-30× больше визитов чем новый сайт. Полезно показывать клиенту обе цифры одновременно.
+
+```bash
+python3 scripts/business_card.py <ЯБ-counter> 2026-05  # карточка
+python3 scripts/monthly_report.py <site-counter> 2026-05  # сайт
+```
+
+## Подводные камни (грабли которые ловили)
+
+- `ym:s:landingPage` — **не существует**, HTTP 400. Правильное поле страницы входа: `ym:s:startURL`.
+- `ym:s:goalreaches` / `ym:s:goalConversion` без настроенных целей в счётчике → HTTP 400. Перед запросом проверяй `goals_report.py <counter>` — если целей нет, не запрашивай конверсию (либо обернуть в try/except). У клиентских сайтов часто Метрика подключена «как есть», без целей.
+- `ym:s:searchEngine` (с площадкой: `Yandex, search results` / `Yandex.Maps`) ≠ `ym:s:searchEngineRoot` (только бренд: `Yandex`). Для отделения трафика с Карт от трафика из поиска одного поисковика — нужен именно `searchEngine`.
+- Метрики разных пространств в одном запросе нельзя: `ym:pv:pageviews` + `ym:s:visits` → ошибка. Под URL → `ym:pv:*`, под визиты → `ym:s:*`.
 
 ## Безопасность
 

@@ -36,7 +36,10 @@
 | `ym:s:UTMCampaign` | utm_campaign |
 | `ym:s:UTMContent` | utm_content |
 | `ym:s:searchPhrase` | Поисковой фразе (где возможно) |
-| `ym:s:searchEngineRoot` | Поисковику (Yandex, Google, Mail...) |
+| `ym:s:searchEngineRoot` | Корневому поисковику (Yandex, Google, Mail...) |
+| `ym:s:searchEngine` | Конкретному поисковику с указанием площадки (`Yandex, search results`, `Google, search results`, `Yandex.Maps`, `DuckDuckGo`) |
+| `ym:s:startURL` | Странице входа (landing page) — куда зашёл визит. ⚠️ Не `ym:s:landingPage` — этого поля нет, API вернёт 400 |
+| `ym:s:endURL` | Странице выхода |
 | `ym:s:regionCountry` | Страна |
 | `ym:s:regionCity` | Город |
 | `ym:s:deviceCategory` | desktop / mobile / tablet |
@@ -83,6 +86,13 @@ dimensions=ym:s:regionCity
 filters=ym:s:regionCountry=='Россия'
 sort=-ym:s:visits
 ```
+
+## Типичные ошибки и грабли
+
+- ❌ `ym:s:landingPage` — **такого поля НЕТ.** API вернёт HTTP 400. Правильное: `ym:s:startURL`.
+- ❌ `ym:s:goalConversion` без настроенных целей в счётчике → HTTP 400. У сайтов клиентов часто Метрика подключена без целей. Перед запросом проверь `scripts/goals_report.py <counter>` — если список пустой, не запрашивай конверсию.
+- ❌ `ym:s:visits>100` — метрики нельзя в `filters`, только dimensions/значения dim.
+- ❌ Несовместимые пространства: `ym:pv:URL` (просмотры) и `ym:s:visits` (визиты) — в одном запросе **нельзя**. Под URL страниц → метрики `ym:pv:*`. Под URL входа в визит → `ym:s:startURL` + `ym:s:visits`.
 
 ## Полный список полей
 

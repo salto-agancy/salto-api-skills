@@ -77,6 +77,7 @@ api-yandex-metrika/
 │   ├── cities.py             # топ городов / фильтр ботов
 │   ├── goals_report.py       # цели + конверсии
 │   ├── compare_periods.py    # сравнение двух периодов
+│   ├── seo_audit.py          # SEO-аудит: тренд + источники + organic phrases + bounce by landing
 │   └── logs_export.py        # Logs API — сырые визиты
 ├── examples/
 │   └── response_stat_v1.json
